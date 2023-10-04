@@ -1,0 +1,34 @@
+version: "3"
+
+services:
+  server:
+    image: movie-listing
+    build:
+      context: .
+      target: development
+    command: npm run dev
+    environment:
+      DATABASE_URL: "postgresql://johndoe:Password@123@db:5432/movies?schema=public"
+    ports:
+      - 9000:9000
+    volumes:
+      - .:/home/app
+    depends_on:
+      db:
+        condition: service_started
+
+  db:
+    image: postgres:13
+    ports:
+      - "5532:5432"
+    environment:
+      POSTGRES_PASSWORD: Password@123
+      POSTGRES_USER: johndoe
+      POSTGRES_DB: movies
+    volumes:
+      - type: volume
+        source: movies-db
+        target: /var/lib/movies-db/data
+
+volumes:
+  movies-db:
