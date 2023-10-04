@@ -9,3 +9,43 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique
+  name     String
+  password String
+  movies   Movie[]
+}
+
+model Genre {
+  id    Int     @id @default(autoincrement())
+  title String  @unique
+  movie Movie[]
+
+  @@index([title])
+}
+
+model Actor {
+  id    Int      @id @default(autoincrement())
+  name  String
+  sex   Sex
+  dob   DateTime @db.Date
+  movie Movie[]
+}
+
+model Movie {
+  id         Int      @id @default(autoincrement())
+  name       String
+  rating     Int
+  releasedOn DateTime @db.Date
+  cast       Actor[]
+  genre      Genre[]
+  user       User     @relation(fields: [userId], references: [id])
+  userId     Int
+}
+
+enum Sex {
+  MALE
+  FEMALE
+}
