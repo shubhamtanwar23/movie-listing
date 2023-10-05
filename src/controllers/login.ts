@@ -9,6 +9,9 @@ import { prismaClient } from "../db";
 export const loginController = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    req.logger.error("loginController: validation error", {
+      error: errors.array(),
+    });
     return res.status(400).send({
       success: false,
       errors: errors.array(),
@@ -20,10 +23,14 @@ export const loginController = async (req: Request, res: Response) => {
   });
 
   if (!user) {
+    req.logger.info(
+      `loginController: User with ${req.body.email} doesn't exists`
+    );
     return res
       .status(404)
       .send({ success: false, message: "User not registered" });
   }
+  req.logger.debug("loginController: User found", { user });
 
   // verify password
   if (await compare(req.body.password, user.password)) {
@@ -36,6 +43,7 @@ export const loginController = async (req: Request, res: Response) => {
     });
   }
 
+  req.logger.debug("loginController: password matching failed");
   return res.status(400).send({
     success: false,
     message: "Invalid email or password",

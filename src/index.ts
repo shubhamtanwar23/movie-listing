@@ -1,12 +1,23 @@
 import express, { Request, Response } from "express";
+import { Logger } from "winston";
 import { registerValidateSchema } from "./validations/register";
 import { registerController } from "./controllers/register";
 import { loginValidateSchema } from "./validations/login";
 import { loginController } from "./controllers/login";
+import loggerMiddleware from "./middlewares/logger";
+
+declare global {
+  namespace Express {
+    export interface Request {
+      logger: Logger;
+    }
+  }
+}
 
 const port = process.env.PORT || 9000;
 const app = express();
 app.use(express.json());
+app.use(loggerMiddleware);
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");

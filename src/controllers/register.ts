@@ -9,6 +9,9 @@ import { prismaClient } from "../db";
 export const registerController = async (req: Request, res: Response) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    req.logger.error("registerController: validation error", {
+      error: errors.array(),
+    });
     return res.status(400).send({
       success: false,
       errors: errors.array(),
@@ -20,6 +23,9 @@ export const registerController = async (req: Request, res: Response) => {
   });
 
   if (exists) {
+    req.logger.info(
+      `registerController: User with ${req.body.email} already exists`
+    );
     return res.send({ success: false, message: "User already registered" });
   }
 
@@ -29,6 +35,7 @@ export const registerController = async (req: Request, res: Response) => {
       password: await hash(req.body.password, saltRounds),
     },
   });
+  req.logger.debug("registerController: User created", { user });
 
   return res.send({
     success: true,
