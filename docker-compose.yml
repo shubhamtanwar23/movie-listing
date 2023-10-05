@@ -9,10 +9,11 @@ services:
     command: npm run dev
     environment:
       DATABASE_URL: "postgresql://johndoe:Password@123@db:5432/movies?schema=public"
+      SECRET: "036accd2d3308f1589c426f4e71d1d7c9d618e2c48886edde71961a1dde6ffa63f4f566970b7acd6ea10925f4d3b2a8c5e75b77268c7553cd55ffd7ce1811fc4"
     ports:
       - 9000:9000
     volumes:
-      - .:/home/app
+      - ./src:/home/app/src/
     depends_on:
       db:
         condition: service_started
