@@ -37,7 +37,7 @@ export const loginController = async (req: Request, res: Response) => {
     return res.send({
       success: true,
       message: "Logged in successfully!",
-      token: jwt.sign({ id: user.id }, JWTToken as string, {
+      token: jwt.sign({ userId: user.id }, JWTToken as string, {
         expiresIn: "1800s",
       }),
     });
