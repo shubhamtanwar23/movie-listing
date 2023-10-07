@@ -3,9 +3,10 @@ import { validationResult } from "express-validator";
 
 import { prismaClient } from "../db";
 import { Prisma } from "@prisma/client";
+import { PAGE_SIZE } from "../constants";
 
 export const getMoviesController = async (req: Request, res: Response) => {
-  const pageSize = parseInt((req.query.size as string) || "30", 10);
+  const pageSize = parseInt((req.query.size as string) || PAGE_SIZE, 10);
   const queryOption: Prisma.MovieFindManyArgs = {
     take: pageSize,
     where: { userId: req.userId },
