@@ -54,7 +54,7 @@ export const addMovieController = async (req: Request, res: Response) => {
   });
   if (validActorIdCount !== cast.length) {
     req.logger.error(
-      `Found only ${validActorIdCount} actors in DB. ${cast.length} were sent in request`
+      `addMovieController: Found only ${validActorIdCount} actors in DB. ${cast.length} were sent in request`
     );
     return res
       .status(400)
@@ -66,7 +66,7 @@ export const addMovieController = async (req: Request, res: Response) => {
   });
   if (validGenreCount !== genre.length) {
     req.logger.error(
-      `Found only ${validGenreCount} genre in DB. ${genre.length} were sent in request`
+      `addMovieController: Found only ${validGenreCount} genre in DB. ${genre.length} were sent in request`
     );
 
     return res
@@ -104,8 +104,35 @@ export const addMovieController = async (req: Request, res: Response) => {
     });
     res.send({ success: true, movie });
   } catch (error) {
-    req.logger.error(error);
     req.logger.error("addMovieController: failed to create movie", { error });
-    res.status(500).send({ success: false });
+    res
+      .status(500)
+      .send({ success: false, error: error.message || "Something went wrong" });
+  }
+};
+
+export const deleteMovieController = async (req: Request, res: Response) => {
+  const { movieId } = req.params;
+  const id = parseInt(movieId, 10);
+  if (isNaN(id)) {
+    return res.status(400).send({ success: false, error: "Invalid Movie ID" });
+  }
+
+  try {
+    await prismaClient.movie.delete({ where: { id } });
+    return res.status(204).send();
+  } catch (error) {
+    req.logger.error("deleteMovieController: Query failed", { error });
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      if (error.code === "P2025") {
+        return res
+          .status(404)
+          .send({ success: false, error: "Movie not found" });
+      }
+      return res.status(500).send({ success: false, error: error.message });
+    }
+    return res
+      .status(500)
+      .send({ success: false, error: "Something went wrong" });
   }
 };
