@@ -8,5 +8,6 @@ const router = Router();
 router.use(authentication);
 
 router.get("/movies", getMoviesController);
+router.post("/movies", addMovieValidateSchema, addMovieController);
 
 export { router as moviesRouter };
