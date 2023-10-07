@@ -7,6 +7,7 @@ import { loginValidateSchema } from "./validations/login";
 import { loginController } from "./controllers/login";
 import { moviesRouter } from "./routes/movies";
 import { genreRouter } from "./routes/genre";
+import { actorRouter } from "./routes/actor";
 import loggerMiddleware from "./middlewares/logger";
 
 declare global {
@@ -31,6 +32,7 @@ app.post("/api/register", registerValidateSchema, registerController);
 app.post("/api/login", loginValidateSchema, loginController);
 app.use("/api", moviesRouter);
 app.use("/api", genreRouter);
+app.use("/api", actorRouter);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
