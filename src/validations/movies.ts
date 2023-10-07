@@ -1,6 +1,6 @@
 import { checkSchema } from "express-validator";
 
-export const addMovieValidateSchema = checkSchema({
+export const movieValidateSchema = checkSchema({
   name: {
     exists: { errorMessage: "Movie name is required", bail: true },
     isString: { errorMessage: "Movie name should be string" },
