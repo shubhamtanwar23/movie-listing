@@ -95,7 +95,7 @@ export const addMovieController = async (req: Request, res: Response) => {
       data: {
         name,
         rating,
-        releasedOn,
+        releasedOn: new Date(releasedOn),
         cast: {
           connect: cast.map((actorId: number) => ({
             id: actorId,

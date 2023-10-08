@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movies</title>
+  </head>
+  <body>
+    <h1>Add Movie</h1>
+    <form id="add-movie-form" method="post">
+      <div>
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name" required />
+      </div>
+      <div>
+        <label for="rating">Rating: </label>
+        <input
+          type="number"
+          name="rating"
+          id="rating"
+          min="1"
+          max="10"
+          step="1"
+          required
+        />
+      </div>
+      <div>
+        <label for="release">Release Date: </label>
+        <input type="date" name="release" id="release" required />
+      </div>
+      <div>
+        <label for="genre">Movie Genre: </label>
+        <select name="genre" id="genre" multiple required>
+          <option value="loading">Loading...</option>
+        </select>
+      </div>
+      <div>
+        <label for="cast">Cast: </label>
+        <select name="cast" id="cast" multiple required>
+          <option value="loading">Loading...</option>
+        </select>
+      </div>
+      <input type="submit" value="Save Movie" />
+    </form>
+
+    <div id="error-div"></div>
+    <script>
+      // API response is paginated. The current logic doesn't handle it
+      // We can implement an infinite scroll here. Also we could just fetch
+      // data basis on user inputs
+      async function loadGenre(token) {
+        const genreSelectElm = document.getElementById("genre");
+        const loadingOption = document.createElement("option");
+        loadingOption.value = "";
+        loadingOption.innerHTML = "Loading...";
+        genreSelectElm.append(loadingOption);
+
+        const resp = await fetch("/api/genre", {
+          method: "GET",
+          headers: {
+            authorization: `Token ${token}`,
+          },
+        });
+
+        const data = await resp.json();
+        if (resp.status === 200) {
+          genreSelectElm.innerHTML = "";
+          data.genres.forEach((element) => {
+            const option = document.createElement("option");
+            option.value = element.id;
+            option.innerHTML = element.title;
+            genreSelectElm.append(option);
+          });
+        } else if (resp.status === 401 || resp.status === 403) {
+          sessionStorage.removeItem("token");
+          document.location.replace("index.html");
+        }
+      }
+
+      // API response is paginated. The current logic doesn't handle it
+      // We can implement an infinite scroll here. Also we could just fetch
+      // data basis on user inputs
+      async function loadCast(token) {
+        const castSelectElm = document.getElementById("cast");
+        const loadingOption = document.createElement("option");
+        loadingOption.value = "";
+        loadingOption.innerHTML = "Loading...";
+        castSelectElm.append(loadingOption);
+
+        const resp = await fetch("/api/actor", {
+          method: "GET",
+          headers: {
+            authorization: `Token ${token}`,
+          },
+        });
+
+        const data = await resp.json();
+        if (resp.status === 200) {
+          castSelectElm.innerHTML = "";
+          data.actors.forEach((element) => {
+            const option = document.createElement("option");
+            option.value = element.id;
+            option.innerHTML = element.name;
+            castSelectElm.append(option);
+          });
+        } else if (resp.status === 401 || resp.status === 403) {
+          sessionStorage.removeItem("token");
+          document.location.replace("index.html");
+        }
+      }
+
+      window.onload = async (event) => {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+          document.location.replace("/index.html");
+        } else {
+          loadGenre(token);
+          loadCast(token);
+        }
+      };
+
+      function getSelectedOptionValue(selectElement) {
+        const result = [];
+        for (option of selectElement.options) {
+          if (option.selected) {
+            result.push(parseInt(option.value, 10));
+          }
+        }
+        return result;
+      }
+
+      const form = document.getElementById("add-movie-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const errorDiv = document.getElementById("error-div");
+        errorDiv.innerHTML = "";
+
+        const nameInput = document.getElementById("name");
+        const ratingInput = document.getElementById("rating");
+        const releaseInput = document.getElementById("release");
+        const genreInput = document.getElementById("genre");
+        const castInput = document.getElementById("cast");
+
+        const resp = await fetch("/api/movies", {
+          method: "POST",
+          body: JSON.stringify({
+            name: nameInput.value,
+            rating: parseInt(ratingInput.value, 10),
+            releasedOn: releaseInput.value,
+            genre: getSelectedOptionValue(genreInput),
+            cast: getSelectedOptionValue(castInput),
+          }),
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${sessionStorage.getItem("token")}`,
+          },
+        });
+
+        const data = await resp.json();
+        if (resp.status === 200) {
+          document.location.replace("/movies.html");
+        } else if (resp.status === 401 || resp.status === 403) {
+          sessionStorage.removeItem("token");
+          document.location.replace("/index.html");
+        } else {
+          if (typeof data.error === "string") {
+            errorDiv.innerHTML = data.error;
+          } else {
+            errorDiv.innerHTML = data.error.map((err) => err.msg).join("<br/>");
+          }
+        }
+      });
+    </script>
+  </body>
+</html>

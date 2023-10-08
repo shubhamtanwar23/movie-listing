@@ -9,7 +9,7 @@
   <body>
     <h1>Your Favorite Movies</h1>
     <div id="container-div"></div>
-    <button style="margin-top: 10px">Add Movie</button>
+    <button style="margin-top: 10px" onclick="goToAddMovie()">Add Movie</button>
     <button style="margin-top: 10px" onclick="logout()">Logout</button>
 
     <script>
@@ -130,6 +130,10 @@
             containerDiv.innerHTML = `Failed to load movies: ${data.error}`;
           }
         }
+      };
+
+      const goToAddMovie = () => {
+        document.location.assign("/addMovie.html");
       };
 
       const logout = () => {
