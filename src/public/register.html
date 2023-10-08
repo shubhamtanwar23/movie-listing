@@ -80,7 +80,6 @@
             if (typeof data.error === "string") {
               errorDiv.innerHTML = data.error;
             } else {
-              console.log("not string");
               errorDiv.innerHTML = data.error
                 .map((err) => err.msg)
                 .join("<br/>");

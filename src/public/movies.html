@@ -25,6 +25,29 @@
 
       let movies;
 
+      const deleteMovie = async (movieId) => {
+        const token = sessionStorage.getItem("token");
+        const resp = await fetch(`/api/movie/${movieId}`, {
+          method: "DELETE",
+          headers: {
+            authorization: `Token ${token}`,
+          },
+        });
+
+        if (resp.status === 204) {
+          delete movies[movieId];
+          containerDiv.innerHTML = "";
+          containerDiv.appendChild(createTable());
+        } else if (resp.status === 401 || resp.status === 403) {
+          // This can be done with a global interceptor instead of each request
+          sessionStorage.removeItem("token");
+          document.location.replace("index.html");
+        } else {
+          const data = resp.json();
+          containerDiv.innerHTML = `Failed to delete movies: ${data.error}`;
+        }
+      };
+
       const createTable = () => {
         const table = document.createElement("table");
         table.style.border = "1px solid black";
@@ -69,6 +92,7 @@
 
               const deleteButton = document.createElement("button");
               deleteButton.textContent = "Delete";
+              deleteButton.onclick = deleteMovie.bind(null, movie.id);
               td.appendChild(deleteButton);
             } else {
               td.appendChild(document.createTextNode(movie[key]));
