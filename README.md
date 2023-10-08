@@ -20,12 +20,22 @@ the [database](#database) section to connect to DB via prisma studio and add ent
 ```shell
 # movie-listing
 $ docker compose build # (optional) to install all the necessary dependencies
+$ docker compose run --rm server npm run migration:run
 $ docker compose up server # to run the connector
 ```
 
 Once the server is up and running go to `http//localhost:9000/index.html`
 
 ## Database
+
+### Migrations
+
+Once you add/change models you need to create migrations and generate prisma client via the following command
+
+```shell
+$ docker compose run --rm npm run migration:generate
+$ docker compose run --rm npx prisma generate
+```
 
 Prisma provided inbuilt GUI to interact with the database. Run the following command to start the client
 

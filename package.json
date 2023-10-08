@@ -5,6 +5,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --notify false --prefer-ts --ignore-watch node_modules -- src/index.ts",
+    "migration:run": "prisma migrate deploy",
+    "migration:generate": "prisma migrate dev",
     "build": "tsc --build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
