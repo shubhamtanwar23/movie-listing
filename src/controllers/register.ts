@@ -26,7 +26,7 @@ export const registerController = async (req: Request, res: Response) => {
     req.logger.info(
       `registerController: User with ${req.body.email} already exists`
     );
-    return res.send({ success: false, message: "User already registered" });
+    return res.send({ success: false, error: "User already registered" });
   }
 
   const user = await prismaClient.user.create({

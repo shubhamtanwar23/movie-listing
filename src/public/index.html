@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Movies</title>
+    <script>
+      window.onload = (event) => {
+        if (sessionStorage.getItem("token")) {
+          document.location.replace("/movies.html");
+        }
+      };
+
+      function onLoginClick() {
+        document.location.assign("/login.html");
+      }
+
+      function onRegisterClick() {
+        document.location.assign("/register.html");
+      }
+    </script>
+  </head>
+
+  <body>
+    <button onclick="onLoginClick()">Login</button>
+    <button onclick="onRegisterClick()">Register</button>
+  </body>
+</html>

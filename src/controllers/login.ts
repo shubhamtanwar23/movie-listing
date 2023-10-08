@@ -28,7 +28,7 @@ export const loginController = async (req: Request, res: Response) => {
     );
     return res
       .status(404)
-      .send({ success: false, message: "User not registered" });
+      .send({ success: false, error: "User not registered" });
   }
   req.logger.debug("loginController: User found", { user });
 
@@ -46,6 +46,6 @@ export const loginController = async (req: Request, res: Response) => {
   req.logger.debug("loginController: password matching failed");
   return res.status(400).send({
     success: false,
-    message: "Invalid email or password",
+    error: "Invalid email or password",
   });
 };

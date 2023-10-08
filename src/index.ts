@@ -23,6 +23,7 @@ const port = process.env.PORT || 9000;
 const app = express();
 app.use(express.json());
 app.use(loggerMiddleware);
+app.use(express.static("src/public"));
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
