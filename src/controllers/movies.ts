@@ -63,7 +63,7 @@ export const addMovieController = async (req: Request, res: Response) => {
     });
     return res.status(400).send({
       success: false,
-      errors: errors.array(),
+      error: errors.array(),
     });
   }
 
@@ -143,7 +143,7 @@ export const updateMovieController = async (req: Request, res: Response) => {
     });
     return res.status(400).send({
       success: false,
-      errors: errors.array(),
+      error: errors.array(),
     });
   }
 

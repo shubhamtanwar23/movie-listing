@@ -14,7 +14,7 @@ export const loginController = async (req: Request, res: Response) => {
     });
     return res.status(400).send({
       success: false,
-      errors: errors.array(),
+      error: errors.array(),
     });
   }
 

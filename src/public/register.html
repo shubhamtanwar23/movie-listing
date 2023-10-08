@@ -4,8 +4,90 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Movies</title>
+
+    <script>
+      window.onload = (event) => {
+        if (sessionStorage.getItem("token")) {
+          document.location.replace("/movies.html");
+        }
+      };
+    </script>
   </head>
+
   <body>
-    <div>Register</div>
+    <form id="register-form" action="/api/register" method="post">
+      <div>
+        <label for="name">Name: </label>
+        <input type="text" name="name" id="name-input" required />
+      </div>
+      <div>
+        <label for="email">Email: </label>
+        <input type="email" name="email" id="email-input" required />
+      </div>
+      <div>
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password-input" required />
+      </div>
+      <div>
+        <label for="confirm-password">Confirm Password: </label>
+        <input
+          type="password"
+          name="confirm-password"
+          id="confirm-password-input"
+          required
+        />
+      </div>
+      <input type="submit" value="Sign Up" />
+    </form>
+    <div id="error-div"></div>
+
+    <script>
+      const form = document.getElementById("register-form");
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+
+        const errorDiv = document.getElementById("error-div");
+        errorDiv.innerHTML = "";
+
+        const nameInput = document.getElementById("name-input");
+        const emailInput = document.getElementById("email-input");
+        const passwordInput = document.getElementById("password-input");
+        const confirmPasswordInput = document.getElementById(
+          "confirm-password-input"
+        );
+
+        if (passwordInput.value !== confirmPasswordInput.value) {
+          errorDiv.innerHTML = "Password and Confirm password didn't matched";
+        } else {
+          const resp = await fetch("/api/register", {
+            method: "POST",
+            body: JSON.stringify({
+              email: emailInput.value,
+              password: passwordInput.value,
+              name: nameInput.value,
+            }),
+            headers: {
+              "Content-Type": "application/json",
+            },
+          });
+
+          const data = await resp.json();
+
+          if (resp.status === 200) {
+            sessionStorage.setItem("token", data.token);
+            document.location.replace("/movies.html");
+          } else {
+            if (typeof data.error === "string") {
+              errorDiv.innerHTML = data.error;
+            } else {
+              console.log("not string");
+              errorDiv.innerHTML = data.error
+                .map((err) => err.msg)
+                .join("<br/>");
+            }
+          }
+        }
+      });
+    </script>
   </body>
 </html>
