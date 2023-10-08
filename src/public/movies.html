@@ -5,7 +5,113 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Movies</title>
   </head>
+
   <body>
-    <div>Movies</div>
+    <h1>Your Favorite Movies</h1>
+    <div id="container-div"></div>
+    <button style="margin-top: 10px">Add Movie</button>
+    <button style="margin-top: 10px" onclick="logout()">Logout</button>
+
+    <script>
+      const containerDiv = document.getElementById("container-div");
+      const tableHeadingsMappingWithKey = {
+        name: "Movie Name",
+        rating: "Rating",
+        releasedOn: "Released On",
+        cast: "Cast",
+        genre: "Genre",
+        action: "Actions",
+      };
+
+      let movies;
+
+      const createTable = () => {
+        const table = document.createElement("table");
+        table.style.border = "1px solid black";
+
+        const thr = table.insertRow();
+        for (const heading of Object.values(tableHeadingsMappingWithKey)) {
+          const th = document.createElement("th");
+          th.appendChild(document.createTextNode(heading));
+          th.style.border = "1px solid black";
+          th.style.padding = "4px";
+          thr.appendChild(th);
+        }
+
+        for (const movieId in movies) {
+          const movie = movies[movieId];
+          const tr = table.insertRow();
+          for (const key of Object.keys(tableHeadingsMappingWithKey)) {
+            const td = tr.insertCell();
+            td.style.border = "1px solid black";
+            td.style.padding = "4px";
+            td.style.textAlign = "center";
+            if (key === "cast") {
+              td.appendChild(
+                document.createTextNode(
+                  movie[key].map((actor) => actor.name).join(", ")
+                )
+              );
+            } else if (key === "genre") {
+              td.appendChild(
+                document.createTextNode(
+                  movie[key].map((genre) => genre.title).join(", ")
+                )
+              );
+            } else if (key === "releasedOn") {
+              td.appendChild(
+                document.createTextNode(new Date(movie[key]).toDateString())
+              );
+            } else if (key === "action") {
+              const updateButton = document.createElement("button");
+              updateButton.textContent = "Update";
+              td.appendChild(updateButton);
+
+              const deleteButton = document.createElement("button");
+              deleteButton.textContent = "Delete";
+              td.appendChild(deleteButton);
+            } else {
+              td.appendChild(document.createTextNode(movie[key]));
+            }
+          }
+        }
+
+        return table;
+      };
+
+      window.onload = async (event) => {
+        const token = sessionStorage.getItem("token");
+        if (!token) {
+          document.location.replace("/index.html");
+        } else {
+          const resp = await fetch("/api/movies", {
+            method: "GET",
+            headers: {
+              authorization: `Token ${token}`,
+            },
+          });
+
+          const data = await resp.json();
+
+          if (resp.status === 200) {
+            movies = data.movies.reduce((acc, curr) => {
+              acc[curr.id] = curr;
+              return acc;
+            }, {});
+            containerDiv.appendChild(createTable());
+          } else if (resp.status === 401 || resp.status === 403) {
+            sessionStorage.removeItem("token");
+            document.location.replace("index.html");
+          } else {
+            containerDiv.innerHTML = `Failed to load movies: ${data.error}`;
+          }
+        }
+      };
+
+      const logout = () => {
+        sessionStorage.removeItem("token");
+        document.location.replace("/index.html");
+      };
+    </script>
   </body>
 </html>
